@@ -26,5 +26,22 @@ public static class Configuration
                 return Results.Problem(e.Message);
             }
         });
+        
+        app.MapDelete("api/client/{idClient}", async (ITripsService service, int idClient) =>
+        {
+            try
+            {
+                var result = await service.DeleteClient(idClient);
+                return Results.Ok(result);
+            }
+            catch (DataException e)
+            {
+                return Results.NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        });
     }
 }

@@ -68,4 +68,20 @@ public class TripsService : ITripsService
             }).ToList(),
         };
     }
+    
+    public async Task<String> DeleteClient(int idClient)
+    {
+        var client = await _context.Clients.FindAsync(idClient);
+        if (client == null)
+            throw new DataException("Client not found");
+
+        var clientTrips = await _context.ClientTrips.Where(ct => ct.IdClient == idClient).ToListAsync();
+        if (clientTrips.Count > 0)
+            throw new DataException("Client has trips and cannot be deleted");
+        
+        _context.Clients.Remove(client);
+        await _context.SaveChangesAsync();
+
+        return "Client deleted";
+    }
 }
