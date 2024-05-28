@@ -27,7 +27,7 @@ public static class Configuration
             }
         });
         
-        app.MapDelete("api/client/{idClient}", async (ITripsService service, int idClient) =>
+        app.MapDelete("api/clients/{idClient}", async (ITripsService service, int idClient) =>
         {
             try
             {
