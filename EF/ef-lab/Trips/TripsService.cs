@@ -1,6 +1,7 @@
 using EF.Trips.Context;
 using EF.Trips.ResponseModels;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace EF.Trips;
 
@@ -18,6 +19,21 @@ public class TripsService : ITripsService
         pageSize ??= 10;
         pageNum ??= 1;
 
+        if (pageNum < 1)
+            throw new ArgumentException("Page number is invalid");
+
+        if (pageSize < 1)
+            throw new ArgumentException("Page size is invalid");
+
+        var tripsCount = await _context.Trips.Where(t => query == null || t.Name.Contains(query)).CountAsync();
+        var allPages = tripsCount / pageSize.Value + (tripsCount % pageSize.Value == 0 ? 0 : 1);
+
+        if (pageNum > allPages)
+            throw new ArgumentException("Page number is too high");
+
+        if (tripsCount == 0)
+            throw new DataException("No trips found");
+
         var trips = await _context.Trips
             .Where(t => query == null || t.Name.Contains(query))
             .Skip((pageNum.Value - 1) * pageSize.Value)
@@ -31,7 +47,7 @@ public class TripsService : ITripsService
         {
             PageNum = pageNum.Value,
             PageSize = pageSize.Value,
-            AllPages = await _context.Trips.CountAsync() / pageSize.Value,
+            AllPages = allPages,
             Trips = trips.Select(t => new Trip
             {
                 Name = t.Name,
