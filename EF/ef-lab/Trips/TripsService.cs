@@ -36,6 +36,7 @@ public class TripsService : ITripsService
 
         var trips = await _context.Trips
             .Where(t => query == null || t.Name.Contains(query))
+            .OrderByDescending(t => t.DateFrom)
             .Skip((pageNum.Value - 1) * pageSize.Value)
             .Take(pageSize.Value)
             .Include(t => t.IdCountries)
