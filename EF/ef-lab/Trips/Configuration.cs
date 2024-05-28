@@ -1,4 +1,5 @@
 using System.Data;
+using EF.Trips.ResponseModels;
 
 namespace EF.Trips;
 
@@ -32,6 +33,23 @@ public static class Configuration
             try
             {
                 var result = await service.DeleteClient(idClient);
+                return Results.Ok(result);
+            }
+            catch (DataException e)
+            {
+                return Results.NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                return Results.Problem(e.Message);
+            }
+        });
+        
+        app.MapPost("api/trips/{idTrip}/clients" , async (ITripsService service, int idTrip, NewClientDetails clientDetails) =>
+        {
+            try
+            {
+                var result = await service.AddClientToTrip(idTrip, clientDetails);
                 return Results.Ok(result);
             }
             catch (DataException e)
